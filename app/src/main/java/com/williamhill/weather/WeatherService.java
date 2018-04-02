@@ -37,8 +37,8 @@ public class WeatherService {
         }
     }
 
-    public static Observable<CurrentWeather> getWeather(String city) {
-        return RetrofitFactory.get().create(WeatherApiService.class).getCurrentWeather(city, APP_ID);
+    public static Observable<CurrentWeather> getWeatherByZipCode(String zipCode) {
+        return RetrofitFactory.get().create(WeatherApiService.class).getCurrentWeather(zipCode + ",us", APP_ID);
     }
 
     private interface WeatherApiService {

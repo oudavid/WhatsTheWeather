@@ -6,4 +6,5 @@
     <string name="pressure_label">Pressure:</string>
     <string name="max_label">Max:</string>
     <string name="min_label">Min:</string>
+    <string name="current_location">Use Current Location</string>
 </resources>

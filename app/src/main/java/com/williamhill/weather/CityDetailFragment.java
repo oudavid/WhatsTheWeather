@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.williamhill.weather.dummy.DummyContent;
 
 /**
  * A fragment representing a single City detail screen.
@@ -69,7 +68,7 @@ public class CityDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.city_name)).setText(city);
         }
 
-        ((TextView) rootView.findViewById(R.id.current_temp)).setText("" + currentTemp);
+        ((TextView) rootView.findViewById(R.id.current_temp)).setText("" + currentTemp + " K");
         ((TextView) rootView.findViewById(R.id.humidity)).setText("" + humidity);
         ((TextView) rootView.findViewById(R.id.pressure)).setText("" + pressure);
         ((TextView) rootView.findViewById(R.id.max_temp)).setText("" + maxTemp);

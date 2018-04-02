@@ -70,7 +70,7 @@ public class CityListActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
         mAdapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<>(), mTwoPane);
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView(recyclerView);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CityListActivity extends AppCompatActivity {
                     String city = uri.toString();
 
 
-                    WeatherService.getWeather(city).subscribe(new Observer<CurrentWeather>() {
+                    WeatherService.getWeatherByZipCode(city).subscribe(new Observer<CurrentWeather>() {
 
                         @Override
                         public void onSubscribe(Disposable d) {
@@ -194,7 +194,7 @@ public class CityListActivity extends AppCompatActivity {
 
             ViewHolder(View view) {
                 super(view);
-                mIdView = (TextView) view.findViewById(R.id.city);
+                mIdView = view.findViewById(R.id.city);
             }
         }
 
