@@ -3,6 +3,8 @@ package com.williamhill.weather;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -20,6 +22,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class AddCityActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
@@ -55,7 +61,16 @@ public class AddCityActivity extends AppCompatActivity implements GoogleApiClien
             }
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (mLocation != null) {
-                finishActivityWithResult(mLocation.toString());
+                Geocoder gcd = new Geocoder(this, Locale.getDefault());
+                try {
+                    List<Address> addresses = gcd.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1);
+                    if (!addresses.isEmpty()) {
+                        finishActivityWithResult(addresses.get(0).getPostalCode());
+                    }
+                } catch (IOException e) {
+                    Log.e(AddCityActivity.class.getSimpleName(), e.getMessage());
+                }
+
             } else {
                 Toast.makeText(this, "Can't find your location!", Toast.LENGTH_SHORT).show();
             }
