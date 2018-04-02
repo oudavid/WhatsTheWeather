@@ -2,6 +2,7 @@ package com.williamhill.weather;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.williamhill.weather.dummy.DummyContent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,23 +37,21 @@ public class CityListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private SimpleItemRecyclerViewAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            Intent addCityActivityIntent = new Intent(CityListActivity.this, AddCityActivity.class);
+            startActivityForResult(addCityActivityIntent, AddCityActivity.REQUEST_CODE);
         });
 
         if (findViewById(R.id.city_detail_container) != null) {
@@ -63,26 +64,43 @@ public class CityListActivity extends AppCompatActivity {
 
         View recyclerView = findViewById(R.id.city_list);
         assert recyclerView != null;
+
+        mAdapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<>(), mTwoPane);
         setupRecyclerView((RecyclerView) recyclerView);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == AddCityActivity.REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    String city = uri.toString();
+                    mAdapter.addCity(city);
+                }
+            }
+        }
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(mAdapter);
     }
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final CityListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<String> mCityList;
         private final boolean mTwoPane;
+
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                String item = (String) view.getTag();
+
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(CityDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putString(CityDetailFragment.ARG_ITEM_ID, item);
                     CityDetailFragment fragment = new CityDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -91,7 +109,7 @@ public class CityListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, CityDetailActivity.class);
-                    intent.putExtra(CityDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra(CityDetailFragment.ARG_ITEM_ID, item);
 
                     context.startActivity(intent);
                 }
@@ -99,9 +117,9 @@ public class CityListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(CityListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      List<String> items,
                                       boolean twoPane) {
-            mValues = items;
+            mCityList = items;
             mParentActivity = parent;
             mTwoPane = twoPane;
         }
@@ -114,28 +132,36 @@ public class CityListActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
+            holder.mIdView.setText(mCityList.get(position));
 
-            holder.itemView.setTag(mValues.get(position));
+            holder.itemView.setTag(mCityList.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
+            holder.itemView.setOnLongClickListener(v -> {
+                mCityList.remove(position);
+                notifyItemChanged(position);
+                notifyItemRangeChanged(position, mCityList.size());
+                return true;
+            });
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return mCityList.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView mIdView;
-            final TextView mContentView;
 
             ViewHolder(View view) {
                 super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mIdView = (TextView) view.findViewById(R.id.city);
             }
+        }
+
+        public void addCity(String city) {
+            mCityList.add(city);
+            notifyDataSetChanged();
         }
     }
 }

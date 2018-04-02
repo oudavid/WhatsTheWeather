@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Weather</string>
     <string name="title_city_detail">City Detail</string>
+    <string name="add_city_searchview_hint">Enter the city or ZIP code"</string>
 </resources>
