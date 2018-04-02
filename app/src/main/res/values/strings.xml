@@ -2,4 +2,8 @@
     <string name="app_name">Weather</string>
     <string name="title_city_detail">City Detail</string>
     <string name="add_city_searchview_hint">Enter the city or ZIP code"</string>
+    <string name="humidity_label">Humidity:</string>
+    <string name="pressure_label">Pressure:</string>
+    <string name="max_label">Max:</string>
+    <string name="min_label">Min:</string>
 </resources>

@@ -6,21 +6,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-import com.williamhill.weather.dummy.DummyContent;
+import com.williamhill.weather.data.CurrentWeather;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * An activity representing a list of Cities. This activity
@@ -62,8 +66,8 @@ public class CityListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        View recyclerView = findViewById(R.id.city_list);
-        assert recyclerView != null;
+        RecyclerView recyclerView = findViewById(R.id.city_list);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
         mAdapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<>(), mTwoPane);
         setupRecyclerView((RecyclerView) recyclerView);
@@ -76,7 +80,30 @@ public class CityListActivity extends AppCompatActivity {
                 Uri uri = data.getData();
                 if (uri != null) {
                     String city = uri.toString();
-                    mAdapter.addCity(city);
+
+
+                    WeatherService.getWeather(city).subscribe(new Observer<CurrentWeather>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(CurrentWeather value) {
+                            runOnUiThread(() -> mAdapter.addCity(value));
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
                 }
             }
         }
@@ -90,17 +117,24 @@ public class CityListActivity extends AppCompatActivity {
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final CityListActivity mParentActivity;
-        private final List<String> mCityList;
+        private final List<CurrentWeather> mCityList;
         private final boolean mTwoPane;
 
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String item = (String) view.getTag();
+                CurrentWeather city = (CurrentWeather) view.getTag();
+
+                Log.d("SFJL", city.toString());
 
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(CityDetailFragment.ARG_ITEM_ID, item);
+                    arguments.putString(CityDetailFragment.ARG_CITY, city.name);
+                    arguments.putFloat(CityDetailFragment.ARG_CURRENT_TEMP, city.main.temp);
+                    arguments.putInt(CityDetailFragment.ARG_HUMIDITY, city.main.humidity);
+                    arguments.putInt(CityDetailFragment.ARG_PRESSURE, city.main.pressure);
+                    arguments.putInt(CityDetailFragment.ARG_MAX_TEMP, city.main.tempMax);
+                    arguments.putInt(CityDetailFragment.ARG_MIN_TEMP, city.main.tempMin);
                     CityDetailFragment fragment = new CityDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -109,7 +143,12 @@ public class CityListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, CityDetailActivity.class);
-                    intent.putExtra(CityDetailFragment.ARG_ITEM_ID, item);
+                    intent.putExtra(CityDetailFragment.ARG_CITY, city.name);
+                    intent.putExtra(CityDetailFragment.ARG_CURRENT_TEMP, city.main.temp);
+                    intent.putExtra(CityDetailFragment.ARG_HUMIDITY, city.main.humidity);
+                    intent.putExtra(CityDetailFragment.ARG_PRESSURE, city.main.pressure);
+                    intent.putExtra(CityDetailFragment.ARG_MAX_TEMP, city.main.tempMax);
+                    intent.putExtra(CityDetailFragment.ARG_MIN_TEMP, city.main.tempMin);
 
                     context.startActivity(intent);
                 }
@@ -117,7 +156,7 @@ public class CityListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(CityListActivity parent,
-                                      List<String> items,
+                                      List<CurrentWeather> items,
                                       boolean twoPane) {
             mCityList = items;
             mParentActivity = parent;
@@ -133,7 +172,7 @@ public class CityListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, final int position) {
-            holder.mIdView.setText(mCityList.get(position));
+            holder.mIdView.setText(mCityList.get(position).name);
 
             holder.itemView.setTag(mCityList.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -159,7 +198,7 @@ public class CityListActivity extends AppCompatActivity {
             }
         }
 
-        public void addCity(String city) {
+        public void addCity(CurrentWeather city) {
             mCityList.add(city);
             notifyDataSetChanged();
         }

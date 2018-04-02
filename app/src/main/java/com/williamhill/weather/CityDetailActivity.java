@@ -25,15 +25,6 @@ public class CityDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -53,8 +44,12 @@ public class CityDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(CityDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(CityDetailFragment.ARG_ITEM_ID));
+            arguments.putString(CityDetailFragment.ARG_CITY, getIntent().getStringExtra(CityDetailFragment.ARG_CITY));
+            arguments.putFloat(CityDetailFragment.ARG_CURRENT_TEMP, getIntent().getFloatExtra(CityDetailFragment.ARG_CURRENT_TEMP, 0f));
+            arguments.putInt(CityDetailFragment.ARG_HUMIDITY, getIntent().getIntExtra(CityDetailFragment.ARG_HUMIDITY, 0));
+            arguments.putInt(CityDetailFragment.ARG_PRESSURE, getIntent().getIntExtra(CityDetailFragment.ARG_PRESSURE, 0));
+            arguments.putInt(CityDetailFragment.ARG_MAX_TEMP, getIntent().getIntExtra(CityDetailFragment.ARG_MAX_TEMP, 0));
+            arguments.putInt(CityDetailFragment.ARG_MIN_TEMP, getIntent().getIntExtra(CityDetailFragment.ARG_MIN_TEMP, 0));
             CityDetailFragment fragment = new CityDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

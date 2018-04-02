@@ -1,9 +1,100 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/city_detail"
-          style="?android:attr/textAppearanceLarge"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:padding="16dp"
-          android:textIsSelectable="true"
-          tools:context="com.williamhill.weather.CityDetailFragment"/>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.williamhill.weather.CityDetailFragment">
+
+    <TextView
+        android:id="@+id/city_name"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        app:layout_constraintLeft_toLeftOf="@id/current_temp"
+        app:layout_constraintRight_toRightOf="@id/current_temp"
+        app:layout_constraintBottom_toTopOf="@id/current_temp"
+        tools:text="Seattle"/>
+
+    <TextView
+        android:id="@+id/current_temp"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="60sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="36"/>
+
+    <TextView
+        android:id="@+id/humidity_label"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/humidity_label"
+        app:layout_constraintStart_toStartOf="@id/current_temp"
+        app:layout_constraintTop_toBottomOf="@id/current_temp"/>
+
+    <TextView
+        android:id="@+id/humidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="90"
+        app:layout_constraintLeft_toRightOf="@id/humidity_label"
+        app:layout_constraintTop_toTopOf="@id/humidity_label"
+        app:layout_constraintBottom_toBottomOf="@id/humidity_label"/>
+
+    <TextView
+        android:id="@+id/pressure_label"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/pressure_label"
+        app:layout_constraintStart_toStartOf="@id/humidity_label"
+        app:layout_constraintTop_toBottomOf="@id/humidity_label"/>
+
+    <TextView
+        android:id="@+id/pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="90"
+        app:layout_constraintLeft_toRightOf="@id/pressure_label"
+        app:layout_constraintTop_toTopOf="@id/pressure_label"
+        app:layout_constraintBottom_toBottomOf="@id/pressure_label"/>
+
+    <TextView
+        android:id="@+id/max_temp_label"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/max_label"
+        app:layout_constraintStart_toStartOf="@id/pressure_label"
+        app:layout_constraintTop_toBottomOf="@id/pressure_label"/>
+
+    <TextView
+        android:id="@+id/max_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="90"
+        app:layout_constraintLeft_toRightOf="@id/max_temp_label"
+        app:layout_constraintTop_toTopOf="@id/max_temp_label"
+        app:layout_constraintBottom_toBottomOf="@id/max_temp_label"/>
+
+    <TextView
+        android:id="@+id/min_temp_label"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="@string/min_label"
+        app:layout_constraintStart_toStartOf="@id/max_temp_label"
+        app:layout_constraintTop_toBottomOf="@id/max_temp_label"/>
+
+    <TextView
+        android:id="@+id/min_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="10"
+        app:layout_constraintLeft_toRightOf="@id/min_temp_label"
+        app:layout_constraintTop_toTopOf="@id/min_temp_label"
+        app:layout_constraintBottom_toBottomOf="@id/min_temp_label"/>
+
+</android.support.constraint.ConstraintLayout>
