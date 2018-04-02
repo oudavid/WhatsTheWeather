@@ -48,7 +48,9 @@ public class AddCityActivity extends AppCompatActivity implements GoogleApiClien
 
         useCurrentLocationButton = findViewById(R.id.use_current_location);
         useCurrentLocationButton.setOnClickListener(v -> {
-            if (!permissionToAccessLocationAccepted) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.ACCESS_FINE_LOCATION },200);
                 return;
             }
             mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -84,11 +86,7 @@ public class AddCityActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] { Manifest.permission.ACCESS_FINE_LOCATION },200);
-            return;
-        }
+        Log.d(AddCityActivity.class.getSimpleName(), "GoogleApiClient connection has been established");
     }
 
     @Override
