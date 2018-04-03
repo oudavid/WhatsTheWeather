@@ -18,6 +18,10 @@ import android.widget.TextView;
  */
 public class CityDetailFragment extends Fragment {
 
+    // ================================================================================
+    // Properties
+    // ================================================================================
+
     public static final String ARG_CITY = "city";
     public static final String ARG_CURRENT_TEMP = "current_temp";
     public static final String ARG_HUMIDITY = "humidity";
@@ -32,12 +36,20 @@ public class CityDetailFragment extends Fragment {
     private int maxTemp;
     private int minTemp;
 
+    // ================================================================================
+    // Constructors
+    // ================================================================================
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public CityDetailFragment() {
     }
+
+    // ================================================================================
+    // Lifecycle
+    // ================================================================================
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

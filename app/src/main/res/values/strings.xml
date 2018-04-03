@@ -7,4 +7,6 @@
     <string name="max_label">Max:</string>
     <string name="min_label">Min:</string>
     <string name="current_location">Use Current Location</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
 </resources>

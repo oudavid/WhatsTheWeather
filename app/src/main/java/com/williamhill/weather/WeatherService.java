@@ -10,16 +10,35 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-/**
- * Created by davidou on 4/1/18.
- */
-
-//http://openweathermap.org/data/2.5/weather?q=98012&
-// appid=b6907d289e10d714a6e88b30761fae22
-
 public class WeatherService {
+
+    // ================================================================================
+    // Properties
+    // ================================================================================
+
     private static final String APP_ID = "b6907d289e10d714a6e88b30761fae22";
     private static final String BASE_URL = "http://openweathermap.org/data/2.5/";
+
+    // ================================================================================
+    // Public Methods
+    // ================================================================================
+
+    public static Observable<CurrentWeather> getWeatherByZipCode(String zipCode) {
+        return RetrofitFactory.get().create(WeatherApiService.class).getCurrentWeather(zipCode + ",us", APP_ID);
+    }
+
+    // ================================================================================
+    // Private Methods
+    // ================================================================================
+
+    private interface WeatherApiService {
+        @GET("weather")
+        Observable<CurrentWeather> getCurrentWeather(@Query("q") String location, @Query("appid") String id);
+    }
+
+    // ================================================================================
+    // Inner Classes
+    // ================================================================================
 
     private static class RetrofitFactory {
 
@@ -35,14 +54,5 @@ public class WeatherService {
             }
             return retrofit;
         }
-    }
-
-    public static Observable<CurrentWeather> getWeatherByZipCode(String zipCode) {
-        return RetrofitFactory.get().create(WeatherApiService.class).getCurrentWeather(zipCode + ",us", APP_ID);
-    }
-
-    private interface WeatherApiService {
-        @GET("weather")
-        Observable<CurrentWeather> getCurrentWeather(@Query("q") String location, @Query("appid") String id);
     }
 }

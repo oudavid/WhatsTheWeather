@@ -34,8 +34,8 @@ public class AddCityActivity extends AppCompatActivity implements GoogleApiClien
 
     static final int REQUEST_CODE = 102;
 
-    SearchView searchView;
-    LinearLayout useCurrentLocationButton;
+    private SearchView searchView;
+    private LinearLayout useCurrentLocationButton;
 
     private Location mLocation;
     private GoogleApiClient mGoogleApiClient;
