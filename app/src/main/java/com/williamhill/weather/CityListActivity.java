@@ -2,26 +2,30 @@ package com.williamhill.weather;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.williamhill.weather.data.CurrentWeather;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -42,6 +46,8 @@ public class CityListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
     private SimpleItemRecyclerViewAdapter mAdapter;
+    private static String SHARED_PREF_LIST_KEY = "city_list_key";
+    private static String SHARED_PREF = "sf_key";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +75,14 @@ public class CityListActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.city_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        mAdapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<>(), mTwoPane);
+        mAdapter = new SimpleItemRecyclerViewAdapter(this, mTwoPane, this);
         setupRecyclerView(recyclerView);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAdapter.storeWeatherListFromSharedPrefs(this);
     }
 
     @Override
@@ -80,8 +92,6 @@ public class CityListActivity extends AppCompatActivity {
                 Uri uri = data.getData();
                 if (uri != null) {
                     String city = uri.toString();
-
-
                     WeatherService.getWeatherByZipCode(city).subscribe(new Observer<CurrentWeather>() {
 
                         @Override
@@ -156,9 +166,8 @@ public class CityListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(CityListActivity parent,
-                                      List<CurrentWeather> items,
-                                      boolean twoPane) {
-            mCityList = items;
+                                      boolean twoPane, Context context) {
+            mCityList = retrieveWeatherListFromSharedPrefs(context);
             mParentActivity = parent;
             mTwoPane = twoPane;
         }
@@ -202,5 +211,39 @@ public class CityListActivity extends AppCompatActivity {
             mCityList.add(city);
             notifyDataSetChanged();
         }
+
+        private void storeWeatherListFromSharedPrefs(Context context) {
+            SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREF, MODE_PRIVATE);
+            String mediaListJSONString = new Gson().toJson(mCityList);
+            sharedPref.edit()
+                    .putString(SHARED_PREF_LIST_KEY, mediaListJSONString)
+                    .commit();
+        }
+
+        private List<CurrentWeather> retrieveWeatherListFromSharedPrefs(Context context) {
+            SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+            String mediaListJSONString = sharedPref.getString(SHARED_PREF_LIST_KEY, "");
+            if (mediaListJSONString.isEmpty()) {
+                return new CopyOnWriteArrayList<>();
+            }
+            Type weatherCollectionType = new TypeToken<Collection<CurrentWeather>>(){}.getType();
+            List<CurrentWeather> list = new Gson().fromJson(mediaListJSONString, weatherCollectionType);
+            if (list != null) {
+                List<CurrentWeather> threadSafeList = new CopyOnWriteArrayList<>();
+                threadSafeList.addAll(list);
+                return threadSafeList;
+            } else {
+                return new CopyOnWriteArrayList<>();
+            }
+        }
+
+        public void clearWeatherListFromSharedPref(@NonNull Context context) {
+            SharedPreferences sharedPref = context.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
+            sharedPref.edit()
+                    .clear()
+                    .commit();
+        }
     }
+
+
 }
